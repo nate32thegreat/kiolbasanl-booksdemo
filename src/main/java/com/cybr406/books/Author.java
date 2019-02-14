@@ -1,5 +1,7 @@
 package com.cybr406.books;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -11,6 +13,10 @@ public class Author {
   Long id;
 
   String name;
+  
+  @Lob
+  @Type(type = "org.hibernate.type.TextType")
+  String bio;
   
   @OneToMany(mappedBy = "author")
   List<Book> books;
@@ -37,6 +43,14 @@ public class Author {
 
   public void setBooks(List<Book> books) {
     this.books = books;
+  }
+
+  public String getBio() {
+    return bio;
+  }
+
+  public void setBio(String bio) {
+    this.bio = bio;
   }
   
 }
