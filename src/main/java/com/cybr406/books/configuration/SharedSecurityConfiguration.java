@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class SharedSecurityConfiguration extends WebSecurityConfigurerAdapter {
   
   @Value("${spring.h2.console.enabled}")
@@ -30,16 +32,18 @@ public class SharedSecurityConfiguration extends WebSecurityConfigurerAdapter {
     http
         .authorizeRequests()
         .antMatchers(HttpMethod.GET, "/").permitAll()
+        .antMatchers(HttpMethod.POST, "/register").permitAll()
         .antMatchers(HttpMethod.GET, "/books", "/books/**", "/authors", "/authors/**").permitAll()
         .anyRequest().hasAnyRole("ADMIN", "AUTHOR")
         .and()
-        .httpBasic()
-        .and()
+        .csrf().disable()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        .csrf().disable();
-
-
+        .httpBasic().authenticationEntryPoint((request, response, authException) -> {
+          if (authException != null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+          }
+        });
   }
   
 }

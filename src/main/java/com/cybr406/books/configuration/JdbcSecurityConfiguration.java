@@ -5,12 +5,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 import javax.sql.DataSource;
 
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 @Profile("jdbc")
 public class JdbcSecurityConfiguration extends SharedSecurityConfiguration {
@@ -22,7 +25,20 @@ public class JdbcSecurityConfiguration extends SharedSecurityConfiguration {
   PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
+  
+  @Bean
+  JdbcUserDetailsManager jdbcUserDetailsManager() {
+    return new JdbcUserDetailsManager(dataSource);
+  }
 
+  @Bean
+  User.UserBuilder userBuilder() {
+    PasswordEncoder passwordEncoder = passwordEncoder();
+    User.UserBuilder users = User.builder();
+    users.passwordEncoder(passwordEncoder::encode);
+    return users;
+  }
+  
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     PasswordEncoder passwordEncoder = passwordEncoder();

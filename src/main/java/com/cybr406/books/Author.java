@@ -12,6 +12,8 @@ public class Author {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
+  String username;
+  
   String name;
   
   @Lob
@@ -51,6 +53,14 @@ public class Author {
 
   public void setBio(String bio) {
     this.bio = bio;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
   
 }
